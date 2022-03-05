@@ -95,3 +95,59 @@
 	  - @Import(AspectV2.class) 추가 
 	- 실행해보면 이전과 동일하게 동작하는 것을 확인할 수 있다. 
 ```
+
+### 스프링 AOP 구현3 - 어드바이스 추가 
+```
+  이번에는 조금 복잡한 예제를 만들어보자. 
+  앞서 로그를 출력하는 기능에 추가로 트랜잭션을 적용하는 코드도 추가해보자. 여기서는 진짜 
+  트랜잭션을 실행하는 것은 아니다. 기능이 동작한 것 처럼 로그만 남기겠다. 
+  
+  트랜잭션 기능은 보통 다음과 같이 동작한다. 
+    - 핵심 로직 실행 직전에 트랜잭션을 시작
+	- 핵심 로직 실행 
+	- 핵심 로직 실행에 문제가 없으면 커밋 
+	- 핵심 로직 실행에 예외가 발생하면 롤백 
+
+  AspectV3
+    - allOrder() 포인트컷은 hello.aop.order 패키지와 하위 패키지를 대상으로 한다
+	- allService() 포인트컷은 타입 이름 패턴이 *Service 를 대상으로 하는데 쉽게 이야기해서
+	  XxxService 처럼 Service 로 끝나는 것을 대상으로 한다. *Servi* 과 같은 패턴도 가능하다.
+	- 여기서 타입 이름 패턴이라고 한 이유는 클래스, 인터페이스에 모두 적용되기 때문이다.
+	
+	@Around("allOrder() && allService()")
+	- 포인트컷은 이렇게 조합할 수 있다. && (AND), || (OR), ! (NOT) 3가지 조합이 가능하다
+	- hello.aop.order 패키지와 하위 패키지 이면서 타입 이름 패턴이 *Service 인 것을 대상으로 한다.
+	- 결과적으로 doTransaction() 어드바이스는 OrderService 에만 적용된다.
+	- doLog() 어드바이스는 OrderService , OrderRepository 에 모두 적용된다.
+
+  포인트것이 적용된 AOP 결과는 다음과 같다
+    - orderService : doLog() , doTransaction() 어드바이스 적용
+	- orderRepository : doLog() 어드바이스 적용
+
+  AopTest - 수정
+    - AspectV3 를 실행하기 위해서 다음 처리를 하자.
+	- @Import(AspectV2.class) 주석 처리
+	- @Import(AspectV3.class) 추가
+
+  전체 실행 순서를 분석해보자.
+  
+  AOP 적용 전
+   클라이언트 -> orderService.orderItem() -> orderRepository.save()
+  
+  AOP 적용 후
+   클라이언트 -> [ doLog() -> doTransaction() ] -> orderService.orderItem()
+   -> [ doLog() ] -> orderRepository.save()
+   
+   - orderService 에는 doLog() , doTransaction() 두가지 어드바이스가 적용되어 있고,
+     orderRepository 에는 doLog() 하나의 어드바이스만 적용된 것을 확인할 수 있다.
+
+  실행 - exception()
+    - 예외 상황에서는 트랜잭션 커밋 대신에 트랜잭션 롤백이 호출되는 것을 확인할 수 있다.
+	- 그런데 여기에서 로그를 남기는 순서가 [doLog() -> doTransaction()] 순서로 작동한다. 
+	  만약 어드바이스가 적용되는 순서를 변경하고 싶으면 어떻게 하면 될까? 예를 들어서 실행 시간을 
+	  측정해야 하는데 트랜잭션과 관련된 시간을 제외하고 측정하고 싶다면 doTransaction()
+	  -> doLog() 이렇게 트랜잭션 이후에 로그를 남겨야 할 것이다. 
+	  
+
+  그 전에 잠깐 포인트컷을 외부로 빼서 사용하는 방법을 먼저 알아보자.
+```
