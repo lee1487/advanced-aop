@@ -332,3 +332,23 @@
   execution은 가장 많이 사용하고, 나머지는 자주 사용하지 않는다. 따라서 execution을
   중점적으로 이해하자.
 ```
+
+### 예제 만들기 
+```
+  포인트컷 표현식을 이해하기 위해 예제 코드를 하나 추가하자. 
+  
+  ClassAop
+  MethodAop
+  MemberService
+  MemberServiceImpl
+  ExecutionTest
+    - AspectJExpressionPointcut이 바로 포인트컷 표현식을 처리해주는 클래스다.
+	  여기에 포인트컷 표현식을 지정하면 된다. AspectJExpressionPointcut는 
+	  상위에 Pointcut 인터페이스를 가진다. 
+	- printMethod() 테스트는 MemberServiceImpl.hello(String)
+	  메서드의 정보를 출력해준다.
+
+  실행 결과 
+    - 이번에 알아볼 execution으로 시작하는 포인트컷 표현식은 이 메서드 정보를 
+	  매칭해서 포인트컷 대상을 찾아낸다.
+```
