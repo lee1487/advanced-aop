@@ -13,44 +13,49 @@ import hello.aop.member.MemberServiceImpl;
 
 public class WithinTest {
 
-	AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
+	
 	Method helloMethod;
 
 	@BeforeEach
 	public void init() throws NoSuchMethodException {
 		helloMethod = MemberServiceImpl.class.getMethod("hello", String.class);
 	}
+	
+	private AspectJExpressionPointcut pointcut(String expression) {
+		AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
+		pointcut.setExpression(expression);
+		return pointcut;
+	}
+	
+	@Test
+	void args() {
+		//hello(String)과 매칭
+		assertThat(pointcut("args(String)").matches(helloMethod, MemberServiceImpl.class)).isTrue();
+		assertThat(pointcut("args(Object)").matches(helloMethod, MemberServiceImpl.class)).isTrue();
+		assertThat(pointcut("args()").matches(helloMethod, MemberServiceImpl.class)).isFalse();
+		assertThat(pointcut("args(..)").matches(helloMethod, MemberServiceImpl.class)).isTrue();
+		assertThat(pointcut("args(*)").matches(helloMethod, MemberServiceImpl.class)).isTrue();
+		assertThat(pointcut("args(String, ..)").matches(helloMethod, MemberServiceImpl.class)).isTrue();
+	}
+	
+	/*
+	 * execution(* *(java.io.Serializable)): 메서드의 시그니처로 판단 (정적)
+	 * args(java.io.Serializable): 런타임에 전달된 인수로 판단 (동적)
+	 */
+	
+	@Test
+	void argsVsExcution() {
+		//Args
+		assertThat(pointcut("args(String)").matches(helloMethod, MemberServiceImpl.class)).isTrue();
+		assertThat(pointcut("args(java.io.Serializable)").matches(helloMethod, MemberServiceImpl.class)).isTrue();
+		assertThat(pointcut("args(Object)").matches(helloMethod, MemberServiceImpl.class)).isTrue();
+		
+		//Execution
+		assertThat(pointcut("execution(* *(String))").matches(helloMethod, MemberServiceImpl.class)).isTrue();
+		assertThat(pointcut("execution(* *(java.io.Serializable))").matches(helloMethod, MemberServiceImpl.class)).isFalse();
+		assertThat(pointcut("execution(* *(Object))").matches(helloMethod, MemberServiceImpl.class)).isFalse();
+	}
 
-	@Test
-	void withinExact() {
-		pointcut.setExpression("within(hello.aop.member.MemberServiceImpl)");
-		assertThat(pointcut.matches(helloMethod, MemberServiceImpl.class)).isTrue();
-	}
 	
-	@Test
-	void withinStar() {
-		pointcut.setExpression("within(hello.aop.member.*Service*)");
-		assertThat(pointcut.matches(helloMethod, MemberServiceImpl.class)).isTrue();
-	}
-	
-	@Test
-	void withinSubPackage() {
-		pointcut.setExpression("within(hello.aop..*)");
-		assertThat(pointcut.matches(helloMethod, MemberServiceImpl.class)).isTrue();
-	}
-	
-	@Test
-	@DisplayName("타켓의 타입에만 직접 적용, 인터페이스를 선정하면 안된다")
-	void withinSuperTypeFalse() {
-		pointcut.setExpression("within(hello.aop.member.MemberService)");
-		assertThat(pointcut.matches(helloMethod, MemberServiceImpl.class)).isFalse();
-	}
-	
-	@Test
-	@DisplayName("execution은 타입 기반, 인터페이스를 선정 가능")
-	void withinSuperTypeTrue() {
-		pointcut.setExpression("execution(* hello.aop.member.MemberService.*(..))");
-		assertThat(pointcut.matches(helloMethod, MemberServiceImpl.class)).isTrue();
-	}
 
 }

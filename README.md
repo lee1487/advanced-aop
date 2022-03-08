@@ -471,3 +471,30 @@
     - 부모 타입(여기서는 MemberService인터페이스)지정시 within은 실패하고, 
 	  execution은 성공하는 것을 확인할 수 있다.
 ```
+
+### args 
+```
+  - args: 인자가 주어진 타입의 인스턴스인 조인 포인트로 매칭 
+  - 기본 문법은 execution의 args부분과 같다. 
+  
+  execution과 args의 차이점 
+    - execution은 파라미터 타입이 정확하게 매칭되어야 한다. execution은 
+	  클래스에 선언된 정보를 기반으로 판단한다. 
+	- args는 부모 타입을 허용한다. args는 실제 넘어온 파라미터 
+	  객체 인스턴스를 보고 판단한다
+
+  ArgsTest
+    - pointcut(): AspectJExpressionPointcut에 포인트컷은 
+	  한번만 지정할 수 있다. 이번 테스트에서는 테스트를 편리하게 진행하기 위해 
+	  포인트컷을 여러번 지정하기 위해 포인트컷 자체를 생성하는 메서드를 만들었다. 
+	- 자바가 기본으로 제공하는 String은 Object, java.io.Serializable의 
+	  하위 타입이다. 
+	- 정적으로 클래스에 선언된 정보만 보고 판단하는 execution(* *(Object))는 
+	  매칭에 실패한다. 
+	- 동적으로 실제 파라미터로 넘어온 객체 인스턴스로 판단하는 args(Object)는 
+	  매칭에 성공한다. (부모 타입 허용) 
+	
+	참고 
+	  - args 지시자는 단독으로 사용되기 보다는 뒤에서 설명할 파라미터 바인딩에서 
+	    주로 사용된다.
+```
