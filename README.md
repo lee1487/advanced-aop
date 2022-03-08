@@ -738,3 +738,35 @@
     - 실행해보면 @Trace가 붙은 request(), save() 호출 시
 	  로그가 잘 남는 것을 확인할 수 있다. 
 ``` 
+
+### 재시도 AOP 
+```
+  이번에는 좀 더 의미있는 재시도 AOP를 만들어보자 
+  @Retry 애노테이션이 있으면 예외가 발생했을 때 다시 시도해서 문제를 복구한다. 
+  
+  @Retry 
+    - 이 애노테이션에는 재시도 횟수로 사용할 값이 있다. 기본값으로 3을 사용한다. 
+
+  RetryAspect
+    - 재시도 하는 애스펙트이다. 
+	- @annotation(retry), Retry retry를 사용해서 어드바이스에
+	  애노테이션을 파라미터로 전달한다. 
+	- retry.value()를 통해서 애노테이션에 지정한 값을 가져올 수 있다. 
+	- 예외가 발생해서 결과가 정상 반환되지 않으면 retry.value()만큼 재시도한다.
+
+  ExamRepository - @Retry 추가
+    - ExamRepository.save() 메서드에 @Retry(value=4)를 적용했다. 
+	  이 메서드에 문제가 발생하면 4번 재시도한다.
+
+  ExamTest - 추가 
+    - @Import(TraceAspect.class)는 주석 처리하고 
+	- @Import({TraceAspect.class, RetryAspect.class})를 
+	  스프링 빈으로 추가하자.
+	
+	실행 결과 
+	  - 실행 결과를 보면 5번째 문제가 발생했을 때 재시도 덕분에 문제가 복구되고,
+	    정상 응답되는 것을 확인할 수 있다.
+	
+	참고 
+	  - 스프링이 제공하는 @Transactional은 가장 대표적인 AOP이다.
+```
