@@ -713,5 +713,28 @@
 	ExamTest 
 	  - 실행해보면 테스트가 5번째 루프를 실행할 때 리포지토리 위치에서 예외가 
 	    발생하면서 실패하는 것을 확인할 수 있다.
-   
 ```
+
+### 로그 출력 AOP 
+```
+  먼저 로그 출력용 AOP를 만들어보자 
+  @Trace가 메서드에 붙어 있으면 호출 정보가 출력되는 편리한 기능이다. 
+  
+  @Trace 
+  TraceAspect 
+    - @annotation(hello.aop.exam.annotation.Trace) 포인트컷을 
+	  사용해서 @Trace가 붙은 메서드에 어드바이스를 적용한다. 
+
+  ExamService - @Trace 추가 
+    - request()에 @Trace를 붙였다. 이제 메서드 호출 정보를 AOP를 사용해서 
+	  로그로 남길 수 있다. 
+  ExamRepository - @Trace 추가 
+    - save()에 @Trace를 붙였다. 
+  ExamTest - 추가 
+    - @Import(TraceAspect.class)를 사용해서 TraceAspect를 스프링 빈으로 
+	  추가하자. 이제 애스펙트가 적용된다.
+
+  실행 결과 
+    - 실행해보면 @Trace가 붙은 request(), save() 호출 시
+	  로그가 잘 남는 것을 확인할 수 있다. 
+``` 
