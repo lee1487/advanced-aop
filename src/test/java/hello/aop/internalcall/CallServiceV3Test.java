@@ -11,14 +11,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Import(CallLogAspect.class)
 @SpringBootTest
-class CallServiceV2Test {
+class CallServiceV3Test {
 
 	@Autowired
-	CallServiceV3 callServiceV3;
+	CallServiceV2 callServiceV2;
 
 	@Test
 	void external() {
-		callServiceV3.external();
+		callServiceV2.external();
 	}
 
 
