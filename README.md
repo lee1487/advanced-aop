@@ -543,3 +543,28 @@
 	    빈 중에는 final로 지정된 빈들도 있기 때문에 오류가 발생할 수 있다. 
 	  - 따라서 이러한 표현식은 최대한 프록시 적용 대상을 축소하는 표현식과 함께 사용해야 한다.
 ```
+
+### @annotation, @args
+```
+  @annotation 
+    정의 
+	  - @annotation: 메서드가 주어진 애노테이션을 가지고 있는 조인 포인트를 매칭 
+	
+	설명 
+	  - @annotation(hello.aop.member.annotation.MethodAop)
+	  
+	  다음과 같이 메서드(조인 포인트에) 애노테이션이 있으면 매칭한다.
+	  public class MemberServiceImpl {
+		@MethodAop("test value")
+		public String hello(String param) {
+			return "ok";
+		}
+	  }
+
+  @args 
+    정의 
+	  - @args: 전달된 실제 인수의 런타임 타입이 주어진 타입의 애노테이션을 갖는 조인 포인트 
+	설명 
+	  - 전달된 인수의 런타임 타입에 @check 애노테이션이 있는 경우에 매칭한다.
+	  @args(test.Check)
+```
